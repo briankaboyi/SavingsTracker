@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.savingstrackerapp.Goal
-import com.example.savingstrackerapp.GoalsViewModel
+import com.example.savingstrackerapp.Screens.GoalsViewModel
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.SavingsList
 
@@ -57,7 +57,6 @@ fun CreateGoal(goalsViewModel: GoalsViewModel) {
             modifier = Modifier.fillMaxWidth().height(44.dp),
             value = goalName,
             onValueChange = { goalName = it},
-
         )
         Spacer(modifier = Modifier.height(46.dp))
 
