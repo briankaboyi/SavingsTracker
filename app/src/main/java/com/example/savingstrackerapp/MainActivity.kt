@@ -25,9 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
-import com.example.savingstrackerapp.Screens.CreateGoal
-import com.example.savingstrackerapp.Screens.GoalsViewModel
+import com.example.savingstrackerapp.screens.CreateGoal
+import com.example.savingstrackerapp.screens.GoalsViewModel
 import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import com.example.savingstrackerapp.ui.theme.SavingsTrackerAppTheme
@@ -50,7 +49,7 @@ class MainActivity : ComponentActivity() {
 //                }
                 //pass createc
 
-                CreateGoal(goalsViewModel )
+//                CreateGoal(goalsViewModel )
             }
         }
     }

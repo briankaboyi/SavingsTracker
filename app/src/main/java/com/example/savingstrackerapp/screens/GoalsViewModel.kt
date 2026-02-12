@@ -1,4 +1,4 @@
-package com.example.savingstrackerapp.Screens
+package com.example.savingstrackerapp.screens
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -17,8 +17,8 @@ class GoalsViewModel(private val repository: GoalSavingsRepository) : ViewModel(
         _goalList.add(goal)
     }
 
-    fun upsert(item : GoalSavingsItem) =CoroutineScope(Dispatchers.Main).launch{repository.upsert(item)}
-    fun delete(item : GoalSavingsItem) =CoroutineScope(Dispatchers.Main).launch{repository.delete(item)}
+    fun upsert(item : GoalSavingsItem) = CoroutineScope(Dispatchers.Main).launch{repository.upsert(item)}
+    fun delete(item : GoalSavingsItem) = CoroutineScope(Dispatchers.Main).launch{repository.delete(item)}
     fun getAllGoalSavingsItems() = repository.getAllGoalSavingsItems()
 
 }
