@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Savings tracker app</string>
+    <string name="its_a_good_day_to_save">Its a good day to save</string>
+    <string name="hello_there">Hello There!</string>
 </resources>

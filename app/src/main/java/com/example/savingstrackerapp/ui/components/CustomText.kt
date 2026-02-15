@@ -1,0 +1,19 @@
+package com.example.savingstrackerapp.ui.components
+
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.example.savingstrackerapp.ui.theme.ProductSans
+
+@Composable
+fun CustomText(fontSize: Int, fontWeight: FontWeight, text: String,fontColor:Color = Color.White){
+    Text(
+        text = text,
+        fontWeight = fontWeight,
+        fontSize= fontSize.sp,
+        color= fontColor,
+        fontFamily = ProductSans
+    )
+}

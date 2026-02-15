@@ -1,7 +1,6 @@
-package com.example.savingstrackerapp.screens
+package com.example.savingstrackerapp.ui.screens
 
 
-import android.R.attr.left
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
@@ -37,9 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.savingstrackerapp.Goal
-import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
-import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import java.util.Calendar
 
 
@@ -80,13 +76,8 @@ fun CreateGoal(
 //        },
 
     ){innerPadding->
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding,).padding(
-            left = 16.dp,
-            start = TODO(),
-            top = TODO(),
-            end = TODO(),
-            bottom = TODO()
-        ).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)
+            .verticalScroll(rememberScrollState())) {
             // Goal Name Input
             Spacer(modifier = Modifier.height(46.dp))
 
@@ -123,7 +114,6 @@ fun CreateGoal(
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded)
                     },
                     modifier = Modifier
-                        .menuAnchor()
                         .fillMaxWidth()
                 )
 

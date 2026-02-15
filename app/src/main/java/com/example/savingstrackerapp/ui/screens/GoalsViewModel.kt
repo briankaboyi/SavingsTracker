@@ -1,4 +1,4 @@
-package com.example.savingstrackerapp.screens
+package com.example.savingstrackerapp.ui.screens
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
