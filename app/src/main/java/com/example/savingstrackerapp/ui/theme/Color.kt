@@ -11,3 +11,10 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val TopAppBarColor = Color(0xFF003125)
+
+val GreenColor =  Color(0xFF3A7D44)
+val BrightGreenColor =  Color(0xFF7ac143)
+
+
+val FieldBorderColor = Color(0xFFCCCCCC)
+val LabelColor = Color(0xFF666666)

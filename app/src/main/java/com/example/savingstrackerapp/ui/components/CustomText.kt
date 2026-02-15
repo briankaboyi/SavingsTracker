@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.sp
 import com.example.savingstrackerapp.ui.theme.ProductSans
 
 @Composable
-fun CustomText(fontSize: Int, fontWeight: FontWeight, text: String,fontColor:Color = Color.White){
+fun CustomText(fontSize: Int, fontWeight: FontWeight = FontWeight.Normal, text: String,fontColor:Color = Color.White){
     Text(
         text = text,
         fontWeight = fontWeight,
