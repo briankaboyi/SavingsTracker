@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,15 +14,17 @@ import com.example.savingstrackerapp.ui.screens.GoalsViewModel
 import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import com.example.savingstrackerapp.ui.navigation.AppNavHost
-import com.example.savingstrackerapp.ui.screens.HomeScreen
 import com.example.savingstrackerapp.ui.theme.SavingsTrackerAppTheme
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var goalSavingsDatabase: GoalSavingsDatabase
     private lateinit var goalsRepository: GoalSavingsRepository
 
-    private val goalsViewModel by viewModels<GoalsViewModel>()
+    private lateinit var goalsViewModel: GoalsViewModel
+
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,24 +32,28 @@ class MainActivity : ComponentActivity() {
         goalSavingsDatabase = GoalSavingsDatabase.invoke(applicationContext)
         goalsRepository = GoalSavingsRepository(goalSavingsDatabase)
 
+        // create ViewModel using factory now that repository is initialized
+        val factory = GoalsViewModelFactory(goalsRepository)
+        goalsViewModel = ViewModelProvider(this, factory).get(GoalsViewModel::class.java)
+
         enableEdgeToEdge()
         setContent {
             SavingsTrackerAppTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
-                //pass createc
-
-//                CreateGoal(goalsViewModel )
-
                 val navController = rememberNavController()
 
-                AppNavHost(navController = navController)
+                AppNavHost(navController = navController, goalsViewModel = goalsViewModel)
             }
         }
+    }
+}
+
+class GoalsViewModelFactory(private val repository: GoalSavingsRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(GoalsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return GoalsViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
@@ -64,11 +69,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     SavingsTrackerAppTheme {
-//        Greeting("Android")
-//        SavingsCard()
-//        SavingsList()
         val navController = rememberNavController()
 
-        HomeScreen(navController)
+//        HomeScreen(navController = navController)
     }
 }

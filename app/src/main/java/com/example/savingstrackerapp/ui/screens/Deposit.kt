@@ -1,7 +1,5 @@
 package com.example.savingstrackerapp.ui.screens
 
-
-
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,11 +18,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -46,11 +44,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.components.CustomButton
 import com.example.savingstrackerapp.ui.components.CustomText
@@ -59,28 +55,45 @@ import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
 
-// Withdrawal method options shown in the radio group
-private enum class WithdrawMethod { COOP_ACCOUNT, M_PESA }
+// ─── Data model for a linked bank account ─────────────────────────────────────
+
+data class LinkedAccount(
+    val nickname: String,       // e.g. "Salary Account"
+    val accountNumber: String,  // e.g. "011090145246202"
+    val balance: Double         // e.g. 87000.00
+)
+
+// ─── Funding method options ────────────────────────────────────────────────────
+
+private enum class FundMethod { COOP_ACCOUNT, M_PESA }
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Withdraw(
-//    goalsViewModel: GoalsViewModel
+fun Deposit(
+    // accept viewmodel and goal id when navigated from AppNavHost
     navController: NavHostController,
-    goalsViewModel: GoalsViewModel
+    goalsViewModel: GoalsViewModel,
+    goalId: Int,
+    availableGoals: List<String> = listOf("Dubai Trip", "Family Fund", "Emergency"),
+    linkedAccounts: List<LinkedAccount> = listOf(
+        LinkedAccount("Salary Account", "011090145246202", 87000.00),
+        LinkedAccount("Business Account", "011090145246300", 45000.00)
+    ),
+//    goalsViewModel: GoalsViewModel
 ) {
+    var selectedGoal       by remember { mutableStateOf(availableGoals.first()) }
+    var goalsExpanded      by remember { mutableStateOf(false) }
 
-    val goals = listOf("Dubai Trip", "Family Fund", "Emergency") // TODO: replace with VM data
-    var selectedGoal    by remember { mutableStateOf(goals.first()) }
-    var goalsExpanded   by remember { mutableStateOf(false) }
+    val goalBalance = 900.00
 
+    var fundMethod         by remember { mutableStateOf(FundMethod.COOP_ACCOUNT) }
 
-    val availableBalance = 900.00
+    var selectedAccount    by remember { mutableStateOf(linkedAccounts.first()) }
+    var accountsExpanded   by remember { mutableStateOf(false) }
 
-    var withdrawMethod  by remember { mutableStateOf(WithdrawMethod.M_PESA) }
-    var phoneNumber     by remember { mutableStateOf("") }
-    var withdrawAmount  by remember { mutableStateOf("") }
-
+    var depositAmount      by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -95,7 +108,7 @@ fun Withdraw(
                         verticalArrangement = Arrangement.Center
                     ) {
                         CustomText(
-                            text = "Withdraw",
+                            text = stringResource(R.string.deposit),
                             fontWeight = FontWeight.Normal,
                             fontSize = 14
                         )
@@ -117,7 +130,6 @@ fun Withdraw(
             ) {
 
                 Spacer(modifier = Modifier.height(24.dp))
-
 
                 CustomText(
                     text = stringResource(R.string.goal_name),
@@ -151,7 +163,7 @@ fun Withdraw(
                         expanded = goalsExpanded,
                         onDismissRequest = { goalsExpanded = false }
                     ) {
-                        goals.forEach { goal ->
+                        availableGoals.forEach { goal ->
                             DropdownMenuItem(
                                 text = { Text(goal) },
                                 onClick = {
@@ -167,13 +179,13 @@ fun Withdraw(
 
                 Row {
                     CustomText(
-                        text = "Available Balance:",
+                        text = "Available balance:",
                         fontSize = 12,
                         fontColor = LabelColor
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     CustomText(
-                        text = "${"%.2f".format(availableBalance)} KES",
+                        text = "${"%.2f".format(goalBalance)} KES",
                         fontSize = 12,
                         fontColor = BrightGreenColor
                     )
@@ -181,21 +193,17 @@ fun Withdraw(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-
                 CustomText(
-                    text = "WIthdraw to:",
+                    text = stringResource(R.string.fund_from),
                     fontSize = 12,
                     fontColor = LabelColor
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        selected = withdrawMethod == WithdrawMethod.COOP_ACCOUNT,
-                        onClick = { withdrawMethod = WithdrawMethod.COOP_ACCOUNT },
+                        selected = fundMethod == FundMethod.COOP_ACCOUNT,
+                        onClick = { fundMethod = FundMethod.COOP_ACCOUNT },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = BrightGreenColor,
                             unselectedColor = FieldBorderColor
@@ -204,15 +212,17 @@ fun Withdraw(
                     CustomText(
                         text = "Coop Account",
                         fontSize = 14,
-                        fontColor = Color.DarkGray
+                        fontColor = if (fundMethod == FundMethod.COOP_ACCOUNT)
+                            BrightGreenColor else Color.DarkGray,
+                        fontWeight = if (fundMethod == FundMethod.COOP_ACCOUNT)
+                            FontWeight.SemiBold else FontWeight.Normal
                     )
 
                     Spacer(modifier = Modifier.width(24.dp))
 
-
                     RadioButton(
-                        selected = withdrawMethod == WithdrawMethod.M_PESA,
-                        onClick = { withdrawMethod = WithdrawMethod.M_PESA },
+                        selected = fundMethod == FundMethod.M_PESA,
+                        onClick = { fundMethod = FundMethod.M_PESA },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = BrightGreenColor,
                             unselectedColor = FieldBorderColor
@@ -221,54 +231,42 @@ fun Withdraw(
                     CustomText(
                         text = "M-PESA",
                         fontSize = 14,
-                        fontColor = if (withdrawMethod == WithdrawMethod.M_PESA)
+                        fontColor = if (fundMethod == FundMethod.M_PESA)
                             BrightGreenColor else Color.DarkGray,
-                        fontWeight = if (withdrawMethod == WithdrawMethod.M_PESA)
+                        fontWeight = if (fundMethod == FundMethod.M_PESA)
                             FontWeight.SemiBold else FontWeight.Normal
                     )
                 }
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (fundMethod == FundMethod.COOP_ACCOUNT) {
+                    CoopAccountSection(
+                        linkedAccounts = linkedAccounts,
+                        selectedAccount = selectedAccount,
+                        accountsExpanded = accountsExpanded,
+                        onExpandedChange = { accountsExpanded = !accountsExpanded },
+                        onAccountSelected = { account ->
+                            selectedAccount = account
+                            accountsExpanded = false
+                        }
+                    )
+                } else {
+                    MpesaPhoneSection()
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // ── Amount to deposit ─────────────────────────────────────────
                 CustomText(
-                    text = "Phone Number",
+                    text = stringResource(R.string.amount_to_deposit),
                     fontSize = 12,
                     fontColor = LabelColor
                 )
                 Spacer(modifier = Modifier.height(7.dp))
                 OutlinedTextField(
-                    value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = null,
-                            tint = FieldBorderColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BrightGreenColor,
-                        unfocusedBorderColor = FieldBorderColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-
-                CustomText(
-                    text = "Amount to Withdraw",
-                    fontSize = 12,
-                    fontColor = LabelColor
-                )
-                Spacer(modifier = Modifier.height(7.dp))
-                OutlinedTextField(
-                    value = withdrawAmount,
-                    onValueChange = { withdrawAmount = it },
+                    value = depositAmount,
+                    onValueChange = { depositAmount = it },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     leadingIcon = {
@@ -299,28 +297,18 @@ fun Withdraw(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-
+                // ── Deposit button ────────────────────────────────────────────
                 CustomButton(
-                    text = "Withdraw",
+                    text = stringResource(R.string.deposit),
                     onClick = {
-                        val amount = withdrawAmount.trim().toDoubleOrNull()
+                        val amount = depositAmount.trim().toDoubleOrNull()
 
-                        if (phoneNumber.isBlank()) {
-                            // TODO: show validation error (Toast / Snackbar)
-                            return@CustomButton
-                        }
                         if (amount == null || amount <= 0) {
                             // TODO: show invalid amount error
                             return@CustomButton
                         }
-                        if (amount > availableBalance) {
-                            // TODO: show insufficient funds error
-                            return@CustomButton
-                        }
 
-                        // For now assume selectedGoal index can be mapped to an id; in future, pass a goalId arg.
-                        // We'll call withdraw on a placeholder id 1 for demonstration.
-                        goalsViewModel.withdraw(1, amount)
+                        goalsViewModel.deposit(goalId, amount)
                         navController.popBackStack()
 
                     },
@@ -330,4 +318,141 @@ fun Withdraw(
         }
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CoopAccountSection(
+    linkedAccounts: List<LinkedAccount>,
+    selectedAccount: LinkedAccount,
+    accountsExpanded: Boolean,
+    onExpandedChange: () -> Unit,
+    onAccountSelected: (LinkedAccount) -> Unit
+) {
+    CustomText(
+        text = stringResource(R.string.credit_account),
+        fontSize = 12,
+        fontColor = LabelColor
+    )
+    Spacer(modifier = Modifier.height(7.dp))
+
+    ExposedDropdownMenuBox(
+        expanded = accountsExpanded,
+        onExpandedChange = { onExpandedChange() }
+    ) {
+        OutlinedTextField(
+            value = selectedAccount.accountNumber,
+            onValueChange = {},
+            readOnly = true,
+            // Card icon prefix
+            leadingIcon = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountBox,
+                        contentDescription = null,
+                        tint = FieldBorderColor,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    VerticalDivider(
+                        modifier = Modifier.height(24.dp),
+                        color = FieldBorderColor
+                    )
+                }
+            },
+            // Nickname shown as a floating label above the account number
+            label = {
+                Text(
+                    text = selectedAccount.nickname,
+                    fontSize = 12.sp,
+                    color = LabelColor
+                )
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(accountsExpanded)
+            },
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = BrightGreenColor,
+                unfocusedBorderColor = FieldBorderColor
+            ),
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = accountsExpanded,
+            onDismissRequest = { onExpandedChange() }
+        ) {
+            linkedAccounts.forEach { account ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(
+                                text = account.nickname,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = account.accountNumber,
+                                fontSize = 12.sp,
+                                color = LabelColor
+                            )
+                        }
+                    },
+                    onClick = { onAccountSelected(account) }
+                )
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(6.dp))
+
+    // Account available balance
+    Row {
+        CustomText(
+            text ="Available balance:",
+            fontSize = 12,
+            fontColor = LabelColor
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        CustomText(
+            text = "${"%.2f".format(selectedAccount.balance)} KES",
+            fontSize = 12,
+            fontColor = BrightGreenColor
+        )
+    }
+}
+
+// ─── M-PESA sub-section ───────────────────────────────────────────────────────
+
+@Composable
+private fun MpesaPhoneSection() {
+    var phoneNumber by remember { mutableStateOf("") }
+
+    CustomText(
+        text = "Phone Number",
+        fontSize = 12,
+        fontColor = LabelColor
+    )
+    Spacer(modifier = Modifier.height(7.dp))
+    OutlinedTextField(
+        value = phoneNumber,
+        onValueChange = { phoneNumber = it },
+        singleLine = true,
+        placeholder = { Text("07XXXXXXXX", color = Color.LightGray) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        shape = RoundedCornerShape(8.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = BrightGreenColor,
+            unfocusedBorderColor = FieldBorderColor
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
 

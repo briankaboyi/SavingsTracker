@@ -2,6 +2,7 @@ package com.example.savingstrackerapp.data.repositories
 
 import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
 import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
+import kotlinx.coroutines.flow.Flow
 
 class GoalSavingsRepository(
     private val db: GoalSavingsDatabase
@@ -13,6 +14,8 @@ class GoalSavingsRepository(
     suspend fun delete(item: GoalSavingsItem) =
         db.getGoalSavingsDao().delete(item)
 
-    fun getAllGoalSavingsItems() = db.getGoalSavingsDao().getAllGoalSavingsItems()
+    fun getAllGoalSavingsItems(): Flow<List<GoalSavingsItem>> = db.getGoalSavingsDao().getAllGoalSavingsItems()
+
+    suspend fun getById(id: Int): GoalSavingsItem? = db.getGoalSavingsDao().getById(id)
 
 }

@@ -68,7 +68,9 @@ import com.example.savingstrackerapp.ui.theme.LabelColor
 import java.util.Calendar
 import android.util.Log
 import android.widget.Toast
-
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 
@@ -79,7 +81,8 @@ import android.widget.Toast
 @Composable
 fun CreateGoal(
 //    goalsViewModel: GoalsViewMode
-navController: NavHostController
+navController: NavHostController,
+goalsViewModel: GoalsViewModel
 ) {
 
     var goalName by remember { mutableStateOf("")}
@@ -89,6 +92,8 @@ navController: NavHostController
     val categories = listOf("Travelling","Family","Other")
     var expanded by remember {mutableStateOf(false)}
     val context = LocalContext.current
+
+    val dateFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
 
     /*
 
@@ -283,16 +288,22 @@ navController: NavHostController
                         // validate inputs before creating/saving goal
                         val amount = targetAmount.trim().toDoubleOrNull()
                         if (goalName.isBlank()) {
-                            // TODO: show user-facing validation (Toast/Snackbar). For now, ignore.
+                            Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
                             return@CustomButton
                         }
                         if (amount == null) {
-                            // invalid number entered; TODO: show error to user. For now, ignore save.
+                            Toast.makeText(context, "Enter a valid amount", Toast.LENGTH_SHORT).show()
                             return@CustomButton
                         }
-                        // If you have a ViewModel or repository available, call it here to save the goal.
-                        // Example (uncomment when using a ViewModel passed into this composable):
-                        // goalsViewModel.addGoal(Goal(amount = amount, name = goalName, targetDate = targetDate, category = goalCategory))
+
+                        val date = try {
+                            if (targetDate.isBlank()) Date() else dateFormat.parse(targetDate)
+                        } catch (e: Exception) {
+                            Date()
+                        }
+
+                        goalsViewModel.createGoal(goalName, amount, date ?: Date(), goalCategory)
+                        navController.popBackStack()
                      },
                      modifier = Modifier
                          .fillMaxWidth()
@@ -325,7 +336,6 @@ fun showDatePicker(
     context: Context,
     onDateSelected: (String) -> Unit
 ) {
-    // Unwrap ContextWrapper to find an Activity instance (LocalContext.current may be a themed wrapper)
     var ctx: Context? = context
     var activity: Activity? = null
     while (ctx != null) {
