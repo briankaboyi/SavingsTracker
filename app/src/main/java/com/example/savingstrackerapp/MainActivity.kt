@@ -10,19 +10,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.savingstrackerapp.ui.screens.GoalsViewModel
 import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
-import com.example.savingstrackerapp.ui.screens.HomePage
+import com.example.savingstrackerapp.ui.navigation.AppNavHost
+import com.example.savingstrackerapp.ui.screens.HomeScreen
 import com.example.savingstrackerapp.ui.theme.SavingsTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
-    private val goalSavingsDatabase = GoalSavingsDatabase(this)
-    private val goalsRepository = GoalSavingsRepository(goalSavingsDatabase)
+
+    private lateinit var goalSavingsDatabase: GoalSavingsDatabase
+    private lateinit var goalsRepository: GoalSavingsRepository
+
     private val goalsViewModel by viewModels<GoalsViewModel>()
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        goalSavingsDatabase = GoalSavingsDatabase.invoke(applicationContext)
+        goalsRepository = GoalSavingsRepository(goalSavingsDatabase)
+
         enableEdgeToEdge()
         setContent {
             SavingsTrackerAppTheme {
@@ -35,6 +43,10 @@ class MainActivity : ComponentActivity() {
                 //pass createc
 
 //                CreateGoal(goalsViewModel )
+
+                val navController = rememberNavController()
+
+                AppNavHost(navController = navController)
             }
         }
     }
@@ -55,10 +67,8 @@ fun GreetingPreview() {
 //        Greeting("Android")
 //        SavingsCard()
 //        SavingsList()
-        HomePage()
+        val navController = rememberNavController()
+
+        HomeScreen(navController)
     }
 }
-
-
-
-

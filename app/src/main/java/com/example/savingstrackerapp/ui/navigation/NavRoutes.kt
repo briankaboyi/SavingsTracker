@@ -1,0 +1,10 @@
+package com.example.savingstrackerapp.ui.navigation
+
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object CreateGoal : Screen("create_goal")
+    object Withdraw : Screen("withdraw")
+    object GoalDetails : Screen("goal_details/{goalId}") {
+        fun createRoute(goalId: String) = "goal_details/$goalId"
+    }
+}

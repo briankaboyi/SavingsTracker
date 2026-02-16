@@ -1,8 +1,10 @@
 package com.example.savingstrackerapp.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,16 +31,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.components.CustomText
 import com.example.savingstrackerapp.ui.components.CustomTopAppBar
+import com.example.savingstrackerapp.ui.navigation.Screen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomePage(){
+fun HomeScreen(navController: NavHostController){
     Scaffold(topBar = {
         CustomTopAppBar(
             navigationIcon = painterResource(id = R.drawable.user),
@@ -64,34 +68,48 @@ fun HomePage(){
         )
 
     }) {  innerPadding ->
+        EmptyContent(navController)
 
-        Column(horizontalAlignment= Alignment.CenterHorizontally){
-            Spacer(modifier = Modifier.height(120.dp))
-            CustomText(fontSize = 18, fontWeight = FontWeight.Normal, text = "Start Saving Towards Your Goals", fontColor = Color.Black)
-            Spacer(modifier = Modifier.height(16.dp))
-            SavingsCard()
-            Spacer(modifier = Modifier.height(38.dp))
-            SavingsList()
-        }
 
     }
 
 }
 @Composable
-fun SavingsCard(){
+fun EmptyContent(navController: NavHostController){
+    Column(horizontalAlignment= Alignment.CenterHorizontally){
+        Spacer(modifier = Modifier.height(120.dp))
+        CustomText(fontSize = 18, fontWeight = FontWeight.Normal, text = "Start Saving Towards Your Goals", fontColor = Color.Black)
+        Spacer(modifier = Modifier.height(16.dp))
+        SavingsCard(onClick = {
+            Log.d("HomeScreen", "SavingsCard clicked, navigate to CreateGoal")
+            navController.navigate(Screen.CreateGoal.route)
+        })
+        Spacer(modifier = Modifier.height(38.dp))
+        SavingsList()
+    }
+}
+@Composable
+fun GoalsHomeContent(){
+
+}
+
+@Composable
+fun SavingsCard(onClick:()->Unit={}){
     Box(
 
         modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 16.dp)
+            .height(199.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(color = Color(0xff48ac00))
-            .height(200.dp)
+            .clickable { onClick() }
     ){
-//        Image(
-//            painter = painterResource(id = R.drawable.savings_card_bg),
-//            contentDescription = "Savings Card",
-//            modifier = Modifier.fillMaxWidth()
-//        )
+        Image(
+            painter = painterResource(id = R.drawable.savings_card_bg),
+            contentDescription = "Savings Card",
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Spacer(modifier = Modifier.height(16.dp))
             CustomText(fontSize = 18, fontWeight = FontWeight.Bold, text = "Goals Savings")
@@ -138,5 +156,5 @@ fun SavingsList(){
 @Preview(showBackground = true)
 @Composable
 fun HomePagePreview(){
-    HomePage()
+//    HomeScreen()
 }
