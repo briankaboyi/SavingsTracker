@@ -18,6 +18,6 @@ data class GoalSavingsItem(
     @ColumnInfo(name = "current_amount")
     val currentAmount: Double = 0.0
 ) {
- @PrimaryKey(autoGenerate = true)
- var id :Int? = null
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
 }

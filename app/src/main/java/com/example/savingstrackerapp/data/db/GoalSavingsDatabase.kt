@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.savingstrackerapp.data.db.Converters
 import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
 
 @Database(
     entities = [GoalSavingsItem::class],
-    version =1
-
+    version = 1
 )
+@TypeConverters(Converters::class)
 abstract class GoalSavingsDatabase: RoomDatabase(){
     abstract fun getGoalSavingsDao(): GoalSavingsDao
 

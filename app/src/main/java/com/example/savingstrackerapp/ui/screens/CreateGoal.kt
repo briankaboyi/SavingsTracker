@@ -1,10 +1,10 @@
 package com.example.savingstrackerapp.ui.screens
 
 
-import android.R.attr.enabled
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType
 
 import androidx.compose.material3.OutlinedTextField
@@ -47,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import android.content.ContextWrapper
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +57,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.components.CustomButton
 import com.example.savingstrackerapp.ui.components.CustomText
@@ -62,6 +66,8 @@ import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
 import java.util.Calendar
+import android.util.Log
+import android.widget.Toast
 
 
 
@@ -73,6 +79,7 @@ import java.util.Calendar
 @Composable
 fun CreateGoal(
 //    goalsViewModel: GoalsViewMode
+navController: NavHostController
 ) {
 
     var goalName by remember { mutableStateOf("")}
@@ -130,7 +137,7 @@ fun CreateGoal(
                 )
                 Spacer(modifier = Modifier.height(7.dp))
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight() ,
+                    modifier = Modifier.fillMaxWidth(),
                     value = goalName,
                     onValueChange = { goalName = it},
                     shape = RoundedCornerShape(8.dp),
@@ -195,7 +202,7 @@ fun CreateGoal(
                 )
                 Spacer(modifier = Modifier.height(7.dp))
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     value = targetAmount,
                     onValueChange = { targetAmount = it},
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -238,16 +245,18 @@ fun CreateGoal(
                     readOnly = true,
                     placeholder = { Text("DD/MM/YYYY", color = Color.LightGray) },
                     trailingIcon = {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.user), // swap for a calendar icon drawable
-//                            contentDescription = "Pick date",
-//                            tint = BrightGreenColor
-//                        )
-                        Icon(
-                            imageVector = Icons.Filled.DateRange,
-                            contentDescription = stringResource(R.string.select_date),
-                            tint = BrightGreenColor
-                        )
+                        IconButton(onClick = {
+                            Log.d("CreateGoal", "Date trailingIcon clicked; context=${context.javaClass}")
+                            showDatePicker(context) { date ->
+                                targetDate = date
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = stringResource(R.string.select_date),
+                                tint = BrightGreenColor
+                            )
+                        }
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -256,33 +265,42 @@ fun CreateGoal(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            Log.d("CreateGoal", "Date field clicked; context=${context.javaClass}")
                             showDatePicker(context) { date ->
                                 targetDate = date
                             }
                         }
-                )
+                 )
                 Spacer(modifier = Modifier.weight(1f))
 
                 CustomButton(
                     text = stringResource(R.string.create_a_goal),
                     onClick = {
-//                    goalsViewModel.addGoal(
-//                        Goal(
-//                            amount = targetAmount.toDoubleOrNull() ?: 0.0,
-//                            name = goalName,
-//                            targetDate = targetDate,
-//                            category = goalCategory
-//                        )
-//                    )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+                        // validate inputs before creating/saving goal
+                        val amount = targetAmount.trim().toDoubleOrNull()
+                        if (goalName.isBlank()) {
+                            // TODO: show user-facing validation (Toast/Snackbar). For now, ignore.
+                            return@CustomButton
+                        }
+                        if (amount == null) {
+                            // invalid number entered; TODO: show error to user. For now, ignore save.
+                            return@CustomButton
+                        }
+                        // If you have a ViewModel or repository available, call it here to save the goal.
+                        // Example (uncomment when using a ViewModel passed into this composable):
+                        // goalsViewModel.addGoal(Goal(amount = amount, name = goalName, targetDate = targetDate, category = goalCategory))
+                     },
+                     modifier = Modifier
+                         .fillMaxWidth()
+                 )
 
 
-            }
-        }
+             }
+         }
 
 
     }
@@ -307,18 +325,39 @@ fun showDatePicker(
     context: Context,
     onDateSelected: (String) -> Unit
 ) {
+    // Unwrap ContextWrapper to find an Activity instance (LocalContext.current may be a themed wrapper)
+    var ctx: Context? = context
+    var activity: Activity? = null
+    while (ctx != null) {
+        if (ctx is Activity) {
+            activity = ctx
+            break
+        }
+        if (ctx is ContextWrapper) ctx = ctx.baseContext else break
+    }
+    if (activity == null) {
+        Log.w("CreateGoal", "showDatePicker: could not find Activity from context=${context?.javaClass}")
+        Toast.makeText(context, "Unable to open date picker", Toast.LENGTH_SHORT).show()
+        return
+    }
+
     val calendar = Calendar.getInstance()
 
-    DatePickerDialog(
-        context,
-        { _, year, month, day ->
-            val date = "$day/${month + 1}/$year"
-            onDateSelected(date)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    ).show()
+    try {
+        DatePickerDialog(
+            activity,
+            { _, year, month, day ->
+                val date = "$day/${month + 1}/$year"
+                onDateSelected(date)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    } catch (e: Exception) {
+        Log.e("CreateGoal", "Error showing DatePickerDialog", e)
+        Toast.makeText(activity, "Unable to open date picker: ${e.message}", Toast.LENGTH_SHORT).show()
+    }
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -330,5 +369,5 @@ fun CreateGoalPreview() {
 //    val goalsRepository = GoalSavingsRepository(goalSavingsDatabase)
 //    val goalsViewModel = GoalsViewModel(goalsRepository)
 //    CreateGoal(goalsViewModel)
-    CreateGoal()
+//    CreateGoal()
 }
