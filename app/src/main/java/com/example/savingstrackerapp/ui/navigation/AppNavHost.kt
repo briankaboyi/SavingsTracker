@@ -36,8 +36,12 @@ fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel)
             Deposit(navController = navController, goalsViewModel = goalsViewModel, goalId = goalId)
         }
 
-        composable(Screen.Withdraw.route) {
-            Withdraw(navController = navController, goalsViewModel = goalsViewModel)
+        composable(
+            route = Screen.Withdraw.route,
+            arguments = listOf(navArgument("goalId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val goalId = backStackEntry.arguments?.getInt("goalId") ?: 0
+            Withdraw(navController = navController, goalsViewModel = goalsViewModel, goalId = goalId)
         }
 
     }

@@ -2,7 +2,6 @@ package com.example.savingstrackerapp.ui.screens
 
 
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
@@ -35,10 +33,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,15 +46,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.components.CustomButton
 import com.example.savingstrackerapp.ui.components.CustomText
 import com.example.savingstrackerapp.ui.components.CustomTopAppBar
+import com.example.savingstrackerapp.ui.components.SuccessDialog
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
@@ -67,25 +66,35 @@ private enum class WithdrawMethod { COOP_ACCOUNT, M_PESA }
 fun Withdraw(
 //    goalsViewModel: GoalsViewModel
     navController: NavHostController,
-    goalsViewModel: GoalsViewModel
+    goalsViewModel: GoalsViewModel,
+    goalId: Int
 ) {
 
-    val goals = listOf("Dubai Trip", "Family Fund", "Emergency") // TODO: replace with VM data
-    var selectedGoal    by remember { mutableStateOf(goals.first()) }
+    val goals = goalsViewModel.getAllGoalSavingsItems().collectAsState(initial = emptyList()).value
+
+    var selectedGoalId by remember { mutableStateOf(0) }
+    LaunchedEffect(goals) {
+        if (goals.isNotEmpty()) {
+            selectedGoalId = if (goalId != 0) goalId else goals.first().id
+        }
+    }
+
     var goalsExpanded   by remember { mutableStateOf(false) }
 
-
-    val availableBalance = 900.00
+    val selectedGoalItem = goals.find { it.id == selectedGoalId }
+    val selectedGoalName = selectedGoalItem?.name ?: ""
+    val availableBalance = selectedGoalItem?.currentAmount ?: 0.0
 
     var withdrawMethod  by remember { mutableStateOf(WithdrawMethod.M_PESA) }
     var phoneNumber     by remember { mutableStateOf("") }
+    var selectedAccountName by remember { mutableStateOf("") }
     var withdrawAmount  by remember { mutableStateOf("") }
 
 
     Scaffold(
         topBar = {
             CustomTopAppBar(
-                navigationIcon = painterResource(id = R.drawable.user),
+                navigationIcon = painterResource(id = R.drawable.arrow_back),
                 titleContent = {
                     Column(
                         modifier = Modifier
@@ -101,7 +110,9 @@ fun Withdraw(
                         )
                     }
                 },
-                onNavigationIconClick = {  }
+                onNavigationIconClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -131,7 +142,7 @@ fun Withdraw(
                     onExpandedChange = { goalsExpanded = !goalsExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedGoal,
+                        value = selectedGoalName,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = {
@@ -143,7 +154,7 @@ fun Withdraw(
                             unfocusedBorderColor = FieldBorderColor
                         ),
                         modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                            .menuAnchor()
                             .fillMaxWidth()
                     )
 
@@ -153,9 +164,9 @@ fun Withdraw(
                     ) {
                         goals.forEach { goal ->
                             DropdownMenuItem(
-                                text = { Text(goal) },
+                                text = { Text(goal.name) },
                                 onClick = {
-                                    selectedGoal = goal
+                                    selectedGoalId = goal.id
                                     goalsExpanded = false
                                 }
                             )
@@ -330,4 +341,3 @@ fun Withdraw(
         }
     }
 }
-

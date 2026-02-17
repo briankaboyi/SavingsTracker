@@ -32,7 +32,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorType
+
 
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -68,6 +68,8 @@ import com.example.savingstrackerapp.ui.theme.LabelColor
 import java.util.Calendar
 import android.util.Log
 import android.widget.Toast
+import com.example.savingstrackerapp.ui.components.SuccessDialog
+import com.example.savingstrackerapp.ui.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -102,7 +104,7 @@ goalsViewModel: GoalsViewModel
     Scaffold(
         topBar = {
             CustomTopAppBar(
-                navigationIcon = painterResource(id = R.drawable.user),
+                navigationIcon = painterResource(id = R.drawable.arrow_back),
                 titleContent = {
                     Column(
                         modifier = Modifier.fillMaxWidth().fillMaxHeight(),
@@ -117,7 +119,10 @@ goalsViewModel: GoalsViewModel
 
                     }
                 },
-                onNavigationIconClick = {  }
+                onNavigationIconClick = {
+
+                    navController.popBackStack()
+                }
             )
 
         }
@@ -178,7 +183,7 @@ goalsViewModel: GoalsViewModel
                             unfocusedBorderColor = FieldBorderColor
                         ),
                         modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                            .menuAnchor()
                             .fillMaxWidth()
                     )
 
@@ -245,6 +250,7 @@ goalsViewModel: GoalsViewModel
                 Spacer(modifier = Modifier.height(7.dp))
 
                 OutlinedTextField(
+
                     value = targetDate,
                     onValueChange = {},
                     readOnly = true,

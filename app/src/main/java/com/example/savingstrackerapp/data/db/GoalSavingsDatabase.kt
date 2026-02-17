@@ -7,14 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.savingstrackerapp.data.db.Converters
 import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
+import com.example.savingstrackerapp.data.db.entities.TransactionEntity
 
 @Database(
-    entities = [GoalSavingsItem::class],
+    entities = [GoalSavingsItem::class, TransactionEntity::class],
     version = 1
 )
 @TypeConverters(Converters::class)
 abstract class GoalSavingsDatabase: RoomDatabase(){
     abstract fun getGoalSavingsDao(): GoalSavingsDao
+    abstract fun getTransactionDao(): TransactionDao
 
     companion object{
         @Volatile
@@ -26,6 +28,8 @@ abstract class GoalSavingsDatabase: RoomDatabase(){
         }
 
         private fun createDatabse(context: Context) =
-            Room.databaseBuilder(context.applicationContext,GoalSavingsDatabase::class.java,"GoalSavings.db").build()
+            Room.databaseBuilder(context.applicationContext,GoalSavingsDatabase::class.java,"GoalSavings.db")
+                .fallbackToDestructiveMigration()
+                .build()
     }
 }

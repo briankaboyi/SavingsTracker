@@ -1,6 +1,5 @@
 package com.example.savingstrackerapp.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
+
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
@@ -33,10 +32,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,8 +55,8 @@ import com.example.savingstrackerapp.ui.components.CustomTopAppBar
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
-
-// ─── Data model for a linked bank account ─────────────────────────────────────
+import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
+import com.example.savingstrackerapp.ui.components.SuccessDialog
 
 data class LinkedAccount(
     val nickname: String,       // e.g. "Salary Account"
@@ -63,42 +64,50 @@ data class LinkedAccount(
     val balance: Double         // e.g. 87000.00
 )
 
-// ─── Funding method options ────────────────────────────────────────────────────
 
 private enum class FundMethod { COOP_ACCOUNT, M_PESA }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Deposit(
-    // accept viewmodel and goal id when navigated from AppNavHost
     navController: NavHostController,
     goalsViewModel: GoalsViewModel,
     goalId: Int,
-    availableGoals: List<String> = listOf("Dubai Trip", "Family Fund", "Emergency"),
     linkedAccounts: List<LinkedAccount> = listOf(
         LinkedAccount("Salary Account", "011090145246202", 87000.00),
         LinkedAccount("Business Account", "011090145246300", 45000.00)
     ),
 //    goalsViewModel: GoalsViewModel
 ) {
-    var selectedGoal       by remember { mutableStateOf(availableGoals.first()) }
+    val goals = goalsViewModel.getAllGoalSavingsItems().collectAsState(initial = emptyList()).value
+
+    var selectedGoalId by remember { mutableStateOf(0) }
+    LaunchedEffect(goals) {
+        if (goals.isNotEmpty()) {
+            selectedGoalId = if (goalId != 0) goalId else goals.first().id
+        }
+    }
+
     var goalsExpanded      by remember { mutableStateOf(false) }
 
-    val goalBalance = 900.00
+    val selectedGoalItem: GoalSavingsItem? = goals.find { it.id == selectedGoalId }
+    val goalBalance = selectedGoalItem?.currentAmount ?: 0.0
+    val selectedGoalName = selectedGoalItem?.name ?: ""
 
     var fundMethod         by remember { mutableStateOf(FundMethod.COOP_ACCOUNT) }
 
     var selectedAccount    by remember { mutableStateOf(linkedAccounts.first()) }
     var accountsExpanded   by remember { mutableStateOf(false) }
 
+    var mpesaPhone by remember { mutableStateOf("") }
+
     var depositAmount      by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             CustomTopAppBar(
-                navigationIcon = painterResource(id = R.drawable.user),
+                navigationIcon = painterResource(id = R.drawable.arrow_back),
                 titleContent = {
                     Column(
                         modifier = Modifier
@@ -114,7 +123,9 @@ fun Deposit(
                         )
                     }
                 },
-                onNavigationIconClick = {  }
+                onNavigationIconClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -143,7 +154,7 @@ fun Deposit(
                     onExpandedChange = { goalsExpanded = !goalsExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedGoal,
+                        value = selectedGoalName,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = {
@@ -155,7 +166,7 @@ fun Deposit(
                             unfocusedBorderColor = FieldBorderColor
                         ),
                         modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                            .menuAnchor()
                             .fillMaxWidth()
                     )
 
@@ -163,11 +174,11 @@ fun Deposit(
                         expanded = goalsExpanded,
                         onDismissRequest = { goalsExpanded = false }
                     ) {
-                        availableGoals.forEach { goal ->
+                        goals.forEach { goal ->
                             DropdownMenuItem(
-                                text = { Text(goal) },
+                                text = { Text(goal.name) },
                                 onClick = {
-                                    selectedGoal = goal
+                                    selectedGoalId = goal.id
                                     goalsExpanded = false
                                 }
                             )
@@ -252,12 +263,11 @@ fun Deposit(
                         }
                     )
                 } else {
-                    MpesaPhoneSection()
+                    MpesaPhoneSection(phoneNumber = mpesaPhone, onPhoneChange = { mpesaPhone = it })
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ── Amount to deposit ─────────────────────────────────────────
                 CustomText(
                     text = stringResource(R.string.amount_to_deposit),
                     fontSize = 12,
@@ -297,7 +307,6 @@ fun Deposit(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // ── Deposit button ────────────────────────────────────────────
                 CustomButton(
                     text = stringResource(R.string.deposit),
                     onClick = {
@@ -344,7 +353,6 @@ private fun CoopAccountSection(
             value = selectedAccount.accountNumber,
             onValueChange = {},
             readOnly = true,
-            // Card icon prefix
             leadingIcon = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -363,7 +371,6 @@ private fun CoopAccountSection(
                     )
                 }
             },
-            // Nickname shown as a floating label above the account number
             label = {
                 Text(
                     text = selectedAccount.nickname,
@@ -380,7 +387,7 @@ private fun CoopAccountSection(
                 unfocusedBorderColor = FieldBorderColor
             ),
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                .menuAnchor()
                 .fillMaxWidth()
         )
 
@@ -412,7 +419,6 @@ private fun CoopAccountSection(
 
     Spacer(modifier = Modifier.height(6.dp))
 
-    // Account available balance
     Row {
         CustomText(
             text ="Available balance:",
@@ -428,12 +434,9 @@ private fun CoopAccountSection(
     }
 }
 
-// ─── M-PESA sub-section ───────────────────────────────────────────────────────
 
 @Composable
-private fun MpesaPhoneSection() {
-    var phoneNumber by remember { mutableStateOf("") }
-
+private fun MpesaPhoneSection(phoneNumber: String, onPhoneChange: (String) -> Unit) {
     CustomText(
         text = "Phone Number",
         fontSize = 12,
@@ -442,7 +445,7 @@ private fun MpesaPhoneSection() {
     Spacer(modifier = Modifier.height(7.dp))
     OutlinedTextField(
         value = phoneNumber,
-        onValueChange = { phoneNumber = it },
+        onValueChange = { onPhoneChange(it) },
         singleLine = true,
         placeholder = { Text("07XXXXXXXX", color = Color.LightGray) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -454,5 +457,3 @@ private fun MpesaPhoneSection() {
         modifier = Modifier.fillMaxWidth()
     )
 }
-
-
