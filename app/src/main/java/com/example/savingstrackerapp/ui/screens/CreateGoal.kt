@@ -77,7 +77,6 @@ import java.util.Locale
 
 
 
-//a form to create a new goal, with fields for the goal name, target amount, and target date, a category selector, and a save button. When the user fills out the form and clicks the save button, the new goal should be added to the list of goals on the home screen.
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +95,7 @@ goalsViewModel: GoalsViewModel
     val context = LocalContext.current
 
     val dateFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     /*
 
@@ -131,6 +131,16 @@ goalsViewModel: GoalsViewModel
         Box(
 
         ){
+            if (showSuccessDialog) {
+                SuccessDialog(
+                    title    = goalName,
+                    subtitle = "Created Successfully",
+                    message  = "You are one step closer to reaching your target",
+                    onButtonClick = { navController.navigate(Screen.Home.route) }
+                )
+            }
+
+
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding)
                     .verticalScroll(rememberScrollState())
@@ -291,7 +301,6 @@ goalsViewModel: GoalsViewModel
                 CustomButton(
                     text = stringResource(R.string.create_a_goal),
                     onClick = {
-                        // validate inputs before creating/saving goal
                         val amount = targetAmount.trim().toDoubleOrNull()
                         if (goalName.isBlank()) {
                             Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
@@ -309,7 +318,8 @@ goalsViewModel: GoalsViewModel
                         }
 
                         goalsViewModel.createGoal(goalName, amount, date ?: Date(), goalCategory)
-                        navController.popBackStack()
+//                        navController.popBackStack()
+                        showSuccessDialog = true
                      },
                      modifier = Modifier
                          .fillMaxWidth()

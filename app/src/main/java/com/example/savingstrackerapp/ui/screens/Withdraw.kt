@@ -58,7 +58,6 @@ import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
 
-// Withdrawal method options shown in the radio group
 private enum class WithdrawMethod { COOP_ACCOUNT, M_PESA }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,6 +89,9 @@ fun Withdraw(
     var selectedAccountName by remember { mutableStateOf("") }
     var withdrawAmount  by remember { mutableStateOf("") }
 
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var successAmount by remember { mutableStateOf(0.0) }
+
 
     Scaffold(
         topBar = {
@@ -118,6 +120,14 @@ fun Withdraw(
     ) { innerPadding ->
 
         Box {
+            if (showSuccessDialog) {
+                SuccessDialog(
+                    title         = "${"%.2f".format(successAmount)} KES",
+                    subtitle      = "Withdraw Successful",
+                    onDismiss     = { showSuccessDialog = false },
+                    onButtonClick = { navController.popBackStack() }
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -329,11 +339,12 @@ fun Withdraw(
                             return@CustomButton
                         }
 
-                        // For now assume selectedGoal index can be mapped to an id; in future, pass a goalId arg.
-                        // We'll call withdraw on a placeholder id 1 for demonstration.
-                        goalsViewModel.withdraw(1, amount)
-                        navController.popBackStack()
-
+                        if (selectedGoalId == 0) return@CustomButton
+                        val method = if (withdrawMethod == WithdrawMethod.COOP_ACCOUNT) selectedAccountName.ifBlank { "Coop Account" } else phoneNumber.ifBlank { "M-PESA" }
+                        goalsViewModel.withdraw(selectedGoalId, amount, method)
+//                        navController.popBackStack()
+                        successAmount = amount
+                        showSuccessDialog = true
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

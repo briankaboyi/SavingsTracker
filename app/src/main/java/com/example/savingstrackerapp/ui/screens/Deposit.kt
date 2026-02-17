@@ -59,9 +59,9 @@ import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
 import com.example.savingstrackerapp.ui.components.SuccessDialog
 
 data class LinkedAccount(
-    val nickname: String,       // e.g. "Salary Account"
-    val accountNumber: String,  // e.g. "011090145246202"
-    val balance: Double         // e.g. 87000.00
+    val nickname: String,
+    val accountNumber: String,
+    val balance: Double
 )
 
 
@@ -104,6 +104,9 @@ fun Deposit(
 
     var depositAmount      by remember { mutableStateOf("") }
 
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var successAmount by remember { mutableStateOf(0.0) }
+
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -131,6 +134,14 @@ fun Deposit(
     ) { innerPadding ->
 
         Box {
+            if (showSuccessDialog) {
+                SuccessDialog(
+                    title         = "${"%.2f".format(successAmount)} KES",
+                    subtitle      = "Withdraw Successful",
+                    onDismiss     = { showSuccessDialog = false },
+                    onButtonClick = { navController.popBackStack() }
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -313,12 +324,18 @@ fun Deposit(
                         val amount = depositAmount.trim().toDoubleOrNull()
 
                         if (amount == null || amount <= 0) {
-                            // TODO: show invalid amount error
                             return@CustomButton
                         }
 
-                        goalsViewModel.deposit(goalId, amount)
-                        navController.popBackStack()
+
+                        if (selectedGoalId == 0) return@CustomButton
+
+                        val method = if (fundMethod == FundMethod.COOP_ACCOUNT) selectedAccount.nickname else mpesaPhone.ifBlank { "M-PESA" }
+
+                        goalsViewModel.deposit(selectedGoalId, amount, method)
+//                        navController.popBackStack()
+                        successAmount = amount
+                        showSuccessDialog = true
 
                     },
                     modifier = Modifier.fillMaxWidth()
