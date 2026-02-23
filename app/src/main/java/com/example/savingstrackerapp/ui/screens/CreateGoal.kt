@@ -70,6 +70,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.savingstrackerapp.ui.components.SuccessDialog
 import com.example.savingstrackerapp.ui.navigation.Screen
+import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -120,7 +121,7 @@ goalsViewModel: GoalsViewModel
                     }
                 },
                 onNavigationIconClick = {
-
+Log.d("CreateGoal", "Back button clicked; context=${context.javaClass}")
                     navController.popBackStack()
                 }
             )
@@ -337,7 +338,7 @@ goalsViewModel: GoalsViewModel
 
 }
 @Composable
-fun GoalsList(viewModel: GoalsViewModel ) {
+fun GoalsList(viewModel: GoalsViewModel) {
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         items(viewModel.dataList.size) { index ->

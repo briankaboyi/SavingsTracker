@@ -1,4 +1,4 @@
-package com.example.savingstrackerapp.ui.screens
+package com.example.savingstrackerapp.ui.viewmodels
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -7,11 +7,11 @@ import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
 import com.example.savingstrackerapp.data.db.entities.TransactionEntity
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import com.example.savingstrackerapp.data.repositories.TransactionRepository
-import kotlinx.coroutines.launch
-import java.util.Date
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class GoalsViewModel(private val repository: GoalSavingsRepository, private val txRepository: TransactionRepository) : ViewModel() {
     private val _goalList = mutableStateListOf<GoalSavingsItem>()
@@ -49,7 +49,8 @@ class GoalsViewModel(private val repository: GoalSavingsRepository, private val 
                 repository.upsert(updated)
 
                 val date = SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(Date())
-                val tx = TransactionEntity(goalId = item.id, type = "DEPOSIT", method = method, amount = amount, date = date)
+                val tx =
+                    TransactionEntity(goalId = item.id, type = "DEPOSIT", method = method, amount = amount, date = date)
                 txRepository.insert(tx)
             }
         }
@@ -65,7 +66,13 @@ class GoalsViewModel(private val repository: GoalSavingsRepository, private val 
                 repository.upsert(updated)
 
                 val date = SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(Date())
-                val tx = TransactionEntity(goalId = item.id, type = "WITHDRAWAL", method = method, amount = amount, date = date)
+                val tx = TransactionEntity(
+                    goalId = item.id,
+                    type = "WITHDRAWAL",
+                    method = method,
+                    amount = amount,
+                    date = date
+                )
                 txRepository.insert(tx)
             }
         }

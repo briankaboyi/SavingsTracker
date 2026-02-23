@@ -57,6 +57,7 @@ import com.example.savingstrackerapp.ui.theme.FieldBorderColor
 import com.example.savingstrackerapp.ui.theme.LabelColor
 import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
 import com.example.savingstrackerapp.ui.components.SuccessDialog
+import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 
 data class LinkedAccount(
     val nickname: String,

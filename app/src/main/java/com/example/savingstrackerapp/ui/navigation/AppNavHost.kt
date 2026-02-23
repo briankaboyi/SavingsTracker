@@ -10,7 +10,7 @@ import com.example.savingstrackerapp.ui.screens.CreateGoal
 import com.example.savingstrackerapp.ui.screens.HomeScreen
 import com.example.savingstrackerapp.ui.screens.Withdraw
 import com.example.savingstrackerapp.ui.screens.Deposit
-import com.example.savingstrackerapp.ui.screens.GoalsViewModel
+import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 
 @Composable
 fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel) {

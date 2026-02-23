@@ -2,6 +2,7 @@ package com.example.savingstrackerapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.savingstrackerapp.ui.screens.GoalsViewModel
+import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 import com.example.savingstrackerapp.data.db.GoalSavingsDatabase
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import com.example.savingstrackerapp.data.repositories.TransactionRepository
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "onCreate called");
 
         enableEdgeToEdge()
         setContent {

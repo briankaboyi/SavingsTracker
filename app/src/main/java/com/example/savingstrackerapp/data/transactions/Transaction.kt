@@ -1,4 +1,4 @@
-package com.example.savingstrackerapp
+package com.example.savingstrackerapp.data.transactions
 
 data class Transaction(
     val type: TransactionType,
