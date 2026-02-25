@@ -7,13 +7,16 @@ import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
 import com.example.savingstrackerapp.data.db.entities.TransactionEntity
 import com.example.savingstrackerapp.data.repositories.GoalSavingsRepository
 import com.example.savingstrackerapp.data.repositories.TransactionRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class GoalsViewModel(private val repository: GoalSavingsRepository, private val txRepository: TransactionRepository) : ViewModel() {
+@HiltViewModel
+class GoalsViewModel @Inject constructor(private val repository: GoalSavingsRepository, private val txRepository: TransactionRepository) : ViewModel() {
     private val _goalList = mutableStateListOf<GoalSavingsItem>()
     val dataList: List<GoalSavingsItem> get() = _goalList
 

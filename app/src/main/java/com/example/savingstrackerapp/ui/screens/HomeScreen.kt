@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.savingstrackerapp.data.db.entities.GoalSavingsItem
@@ -68,7 +69,7 @@ import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    goalsViewModel: GoalsViewModel? = null,
+    goalsViewModel: GoalsViewModel = hiltViewModel(),
     transactions: List<Transaction> = emptyList(),
     onAddGoal: () -> Unit = {},
     onDeposit: (GoalSavingsItem) -> Unit = {},

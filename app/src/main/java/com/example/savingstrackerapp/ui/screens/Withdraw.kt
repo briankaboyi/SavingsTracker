@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.components.CustomButton
@@ -66,7 +67,7 @@ private enum class WithdrawMethod { COOP_ACCOUNT, M_PESA }
 fun Withdraw(
 //    goalsViewModel: GoalsViewModel
     navController: NavHostController,
-    goalsViewModel: GoalsViewModel,
+    goalsViewModel: GoalsViewModel = hiltViewModel(),
     goalId: Int
 ) {
 

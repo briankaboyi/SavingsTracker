@@ -68,6 +68,7 @@ import com.example.savingstrackerapp.ui.theme.LabelColor
 import java.util.Calendar
 import android.util.Log
 import android.widget.Toast
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.savingstrackerapp.ui.components.SuccessDialog
 import com.example.savingstrackerapp.ui.navigation.Screen
 import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
@@ -84,7 +85,7 @@ import java.util.Locale
 fun CreateGoal(
 //    goalsViewModel: GoalsViewMode
 navController: NavHostController,
-goalsViewModel: GoalsViewModel
+goalsViewModel: GoalsViewModel = hiltViewModel()
 ) {
 
     var goalName by remember { mutableStateOf("")}
