@@ -18,3 +18,4 @@ val BrightGreenColor =  Color(0xFF7ac143)
 
 val FieldBorderColor = Color(0xFFCCCCCC)
 val LabelColor = Color(0xFF666666)
+val TextBlack = Color(0xFF666666)

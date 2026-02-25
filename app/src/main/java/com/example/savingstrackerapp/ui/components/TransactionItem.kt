@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.savingstrackerapp.R
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
+import com.example.savingstrackerapp.ui.theme.TextBlack
 
 @Composable
 fun TransactionItem(tx: com.example.savingstrackerapp.data.db.entities.TransactionEntity) {
@@ -27,7 +28,7 @@ fun TransactionItem(tx: com.example.savingstrackerapp.data.db.entities.Transacti
 
     val iconRes = if (isDeposit) R.drawable.ic_deposit else R.drawable.ic_withdrawal
     val iconBg = if (isDeposit) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
-    val amountColor = if (isDeposit) Color.Black else Color(0xFFD32F2F)
+    val amountColor = if (isDeposit) TextBlack else Color(0xFFD32F2F)
     val amountPrefix = if (isDeposit) "KES " else "KES "
 
     Row(
@@ -57,7 +58,7 @@ fun TransactionItem(tx: com.example.savingstrackerapp.data.db.entities.Transacti
             CustomText(
                 text = tx.type.lowercase().replaceFirstChar { it.uppercase() },
                 fontSize = 16,
-                fontColor = Color.Black
+                fontColor = TextBlack
             )
             CustomText(
                 text = tx.method,

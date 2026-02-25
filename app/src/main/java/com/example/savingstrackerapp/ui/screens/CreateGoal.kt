@@ -71,6 +71,7 @@ import android.widget.Toast
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.savingstrackerapp.ui.components.SuccessDialog
 import com.example.savingstrackerapp.ui.navigation.Screen
+import com.example.savingstrackerapp.ui.theme.TextBlack
 import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -343,7 +344,7 @@ fun GoalsList(viewModel: GoalsViewModel) {
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         items(viewModel.dataList.size) { index ->
-            Text(text = viewModel.dataList[index].name, fontSize = 20.sp, color = Color.Black)
+            Text(text = viewModel.dataList[index].name, fontSize = 20.sp, color = TextBlack)
 //            Image(painter = painterResource(id = R.drawable.ad), contentDescription = "Savings Card", modifier = Modifier.fillMaxWidth(),)
 //            Image(painter = painterResource(id = R.drawable.ad__2_), contentDescription = "Savings Card", modifier = Modifier.fillMaxWidth(),)
         }

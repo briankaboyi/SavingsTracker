@@ -40,6 +40,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.R
+import com.example.savingstrackerapp.ui.theme.TextBlack
 
 @Composable
 fun SuccessDialog(
@@ -68,7 +69,7 @@ fun SuccessDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f)),
+                .background(TextBlack.copy(alpha = 0.45f)),
             contentAlignment = Alignment.Center
         ) {
             Column(

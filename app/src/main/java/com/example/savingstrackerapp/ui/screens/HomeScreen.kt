@@ -61,6 +61,7 @@ import com.example.savingstrackerapp.ui.components.TransactionItem
 import com.example.savingstrackerapp.ui.navigation.Screen
 import com.example.savingstrackerapp.ui.theme.BrightGreenColor
 import com.example.savingstrackerapp.ui.theme.SavingsTrackerAppTheme
+import com.example.savingstrackerapp.ui.theme.TextBlack
 import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 
 
@@ -134,9 +135,9 @@ fun EmptyHomeContent(
     modifier: Modifier = Modifier,
     onAddGoal: () -> Unit = {}
 ){
-    Column(horizontalAlignment= Alignment.CenterHorizontally){
+    Column(horizontalAlignment= Alignment.CenterHorizontally,modifier = modifier.background(Color(0xFFF5F5F5))){
         Spacer(modifier = Modifier.height(120.dp))
-        CustomText(fontSize = 18, fontWeight = FontWeight.Normal, text = "Start Saving Towards Your Goals", fontColor = Color.Black)
+        CustomText(fontSize = 18, fontWeight = FontWeight.Normal, text = "Start Saving Towards Your Goals", fontColor = TextBlack)
         Spacer(modifier = Modifier.height(16.dp))
         SavingsCard(onClick = {
             Log.d("HomeScreen", "SavingsCard clicked, navigate to CreateGoal")
@@ -178,7 +179,7 @@ private fun GoalsHomeContent(
                 text = stringResource(R.string.my_goals),
                 fontSize = 16,
                 fontWeight = FontWeight.Bold,
-                fontColor = Color.Black
+                fontColor = TextBlack
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -258,7 +259,7 @@ private fun GoalsHomeContent(
                         text = stringResource(R.string.transaction_history),
                         fontSize = 16,
                         fontWeight = FontWeight.Bold,
-                        fontColor = Color.Black
+                        fontColor = TextBlack
                     )
                     CustomText(
                         text = stringResource(R.string.view_all),

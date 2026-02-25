@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.savingstrackerapp.ui.theme.FieldBorderColor
+import com.example.savingstrackerapp.ui.theme.TextBlack
 
 @Composable
 fun FilterChip(
@@ -23,10 +24,10 @@ fun FilterChip(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(if (selected) Color.Black else Color.Transparent)
+            .background(if (selected) TextBlack else Color.Transparent)
             .border(
                 width = 1.dp,
-                color = if (selected) Color.Black else FieldBorderColor,
+                color = if (selected) TextBlack else FieldBorderColor,
                 shape = RoundedCornerShape(20.dp)
             )
             .clickable { onClick() }

@@ -139,7 +139,7 @@ fun Deposit(
             if (showSuccessDialog) {
                 SuccessDialog(
                     title         = "${"%.2f".format(successAmount)} KES",
-                    subtitle      = "Withdraw Successful",
+                    subtitle      = "Deposit Successful",
                     onDismiss     = { showSuccessDialog = false },
                     onButtonClick = { navController.popBackStack() }
                 )

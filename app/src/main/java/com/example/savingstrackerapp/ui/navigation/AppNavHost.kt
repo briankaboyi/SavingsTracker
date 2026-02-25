@@ -13,7 +13,7 @@ import com.example.savingstrackerapp.ui.screens.Deposit
 import com.example.savingstrackerapp.ui.viewmodels.GoalsViewModel
 
 @Composable
-fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel) {
+fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
@@ -21,11 +21,11 @@ fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel)
     ) {
 
         composable(Screen.Home.route) {
-            HomeScreen(navController = navController, goalsViewModel = goalsViewModel)
+            HomeScreen(navController = navController)
         }
 
         composable(Screen.CreateGoal.route) {
-            CreateGoal(navController = navController, goalsViewModel = goalsViewModel)
+            CreateGoal(navController = navController)
         }
 
         composable(
@@ -33,7 +33,7 @@ fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel)
             arguments = listOf(navArgument("goalId") { type = NavType.IntType })
         ) { backStackEntry ->
             val goalId = backStackEntry.arguments?.getInt("goalId") ?: 0
-            Deposit(navController = navController, goalsViewModel = goalsViewModel, goalId = goalId)
+            Deposit(navController = navController,  goalId = goalId)
         }
 
         composable(
@@ -41,7 +41,7 @@ fun AppNavHost(navController: NavHostController, goalsViewModel: GoalsViewModel)
             arguments = listOf(navArgument("goalId") { type = NavType.IntType })
         ) { backStackEntry ->
             val goalId = backStackEntry.arguments?.getInt("goalId") ?: 0
-            Withdraw(navController = navController, goalsViewModel = goalsViewModel, goalId = goalId)
+            Withdraw(navController = navController, goalId = goalId)
         }
 
     }
